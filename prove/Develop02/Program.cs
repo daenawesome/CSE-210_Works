@@ -364,3 +364,26 @@ namespace DailyJournal
     }
 }
 
+/* 
+The program uses the System.Collections.Generic, 
+System.IO, and System.Text.Json namespaces, 
+which provide classes for managing collections, 
+working with files, and serializing and deserializing JSON data.
+
+Added feature:
+1.	Mood category that adds a layer for even more prompts
+2.	Word count info for user to track their progress in their entries
+3.	Having ‘>> ’ to indicate user input
+
+4.	Saving File:
+    •	No saving of empty Journal Entry
+    •	No Invalid Character for the file name
+    •	Overwrite option if file name chosen is already in the directory
+    •	Converts save entry as ‘.json’ format
+    •	Auto ‘.json’ extension when saving
+
+5.	Loading File:
+    •	Having option to choose files available in the directory (.json files) rather than typing file name
+
+6.	Basic input validation and error handling all over the program
+ */
