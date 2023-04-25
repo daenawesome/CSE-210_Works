@@ -12,6 +12,7 @@ namespace DailyJournal
         public string Response { get; set; }
         public DateTime Date { get; set; }
         public string Mood { get; set; }
+        public int WordCount { get; set; }
     }
 
     // Define the Journal class to manage the collection of entries
@@ -28,6 +29,12 @@ namespace DailyJournal
         // Add a new entry to the journal
         public void AddEntry(Entry entry)
         {
+            // Count the number of words in the user's response
+            int wordCount = entry.Response.Split(new char[] { ' ', '.', '?' }, StringSplitOptions.RemoveEmptyEntries).Length;
+
+            // Set the word count in the entry object
+            entry.WordCount = wordCount;
+            
             entries.Add(entry); // Add the new entry to the list
         }
 
@@ -52,6 +59,7 @@ namespace DailyJournal
                 Console.WriteLine($"Prompt: {entry.Prompt}");
                 Console.WriteLine($"Response: {entry.Response}");
                 Console.WriteLine($"Date: {entry.Date:yyyy-MM-dd HH:mm:ss}");
+                Console.WriteLine($"Words: {entry.WordCount}");
                 Console.WriteLine();
             }
         }
@@ -64,6 +72,7 @@ namespace DailyJournal
             filename = filename.EndsWith(".json") ? filename : $"{filename}.json"; // Save with '.json'
 
             bool fileExists;
+            
             do
             {
                 fileExists = File.Exists(filename);
@@ -95,6 +104,16 @@ namespace DailyJournal
                 Console.WriteLine("Journal is empty. Cannot save an empty journal.");
                 return;
             }
+
+            // Create a list of entries with the word count included
+            var entriesWithWordCount = entries.Select(entry => new
+            {
+                Mood = entry.Mood,
+                Prompt = entry.Prompt,
+                Response = entry.Response,
+                Date = entry.Date,
+                WordCount = entry.WordCount
+            }).ToList();
 
             var options = new JsonSerializerOptions
             {
@@ -141,6 +160,7 @@ namespace DailyJournal
             if (files.Length == 0)
             {
                 Console.WriteLine("No files found.");
+                Console.WriteLine();
                 return;
             }
 
@@ -343,3 +363,4 @@ namespace DailyJournal
         }
     }
 }
+
