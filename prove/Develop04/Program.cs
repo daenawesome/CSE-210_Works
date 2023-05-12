@@ -11,8 +11,8 @@ class Program
     // This method displays a good bye message to the console
     static void DisplayEndMessage()
     {
-        Console.Clear();
-        Console.WriteLine("Good Bye");
+        Console.WriteLine("Till Next Time, Bye!");
+        
     }
 
     // This method displays the menu of available activities to the console
@@ -25,7 +25,9 @@ class Program
             1) Start Breathing Activity
             2) Start Reflection Activity
             3) Start Listing Activity
-            0) Exit
+            4) Start Reminder Activity
+            5) View Log
+            0) Exit and View Log
 
             ");
     }
@@ -36,6 +38,9 @@ class Program
         // Display a welcome message
         Console.WriteLine();
         DisplayWelcomeMessage();
+        
+        // create an instance of ActivityLog
+        ActivityLog activityLog = new ActivityLog();
 
         // Initialize a variable for the user's choice
         int choice = -1;
@@ -63,23 +68,47 @@ class Program
                 case 1:
                     activity = new BreathingActivity();
                     activity.Start();
+                    activityLog.LogActivity("Breathing Activity");
+                    // activityLog.PrintActivityCounts();
                     break;
                 
                 // If the user chose reflection activity, create a new instance of the ReflectionActivity class and start it
                 case 2:
                     activity = new ReflectionActivity();
                     activity.Start();
+                    activityLog.LogActivity("Reflection Activity");
+                    // activityLog.PrintActivityCounts();
                     break;
                 
                 // If the user chose listing activity, create a new instance of the ListingActivity class and start it
                 case 3:
                     activity = new ListingActivity();
                     activity.Start();
+                    activityLog.LogActivity("Listing Activity");
+                    // activityLog.PrintActivityCounts();
                     break;
                 
-                // If the user chose to exit, display a good bye message
+                // If the user chose reminder activity, create a new instance of the ReminderActivity class and start it
+                case 4:
+                    activity = new ReminderActivity();
+                    activity.Start();
+                    activityLog.LogActivity("Reminder Activity");
+                    // activityLog.PrintActivityCounts();
+                    break;
+                
+                // If the user chose to View Log, display Current Log at Header
+                case 5:
+                    Console.Clear();
+                    activityLog.PrintActivityCounts();
+                    break;
+                
+                // If the user chose to exit, display Log and a good bye message
                 case 0:
+                    Console.Clear();
+                    activityLog.PrintActivityCounts(); //Prints Activity Log
+                    Console.WriteLine();
                     DisplayEndMessage();
+                    Console.WriteLine();
                     break;
                 
                 // If the user entered an invalid choice, clear the console and display an error message

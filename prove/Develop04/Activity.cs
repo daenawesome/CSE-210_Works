@@ -91,7 +91,7 @@ class Activity
       // Display a spinner animation for the specified time.
       DateTime futureTime = DateTime.Now.AddSeconds(time);
       DateTime currentTime = DateTime.Now;
-
+      
       string spin = "|/-\\";
 
       do{
