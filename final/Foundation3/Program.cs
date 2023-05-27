@@ -1,8 +1,7 @@
 using System;
-using System.IO;
-using System.Collections.Generic;
 
-// Modified Version that reads data from a text file
+// The program creates instances of different types of events (lecture, reception, outdoor gathering) and generates 
+// marketing messages with standard details, full details, and short descriptions for each event.
 
 // Address class to encapsulate the address details
 public class Address
@@ -12,6 +11,7 @@ public class Address
     public string State { get; set; }
     public string Country { get; set; }
 
+    // Constructor to initialize address details
     public Address(string street, string city, string state, string country)
     {
         Street = street;
@@ -20,6 +20,7 @@ public class Address
         Country = country;
     }
 
+    // Override the ToString() method to provide a string representation of the address
     public override string ToString()
     {
         return $"{Street}, {City}, {State}, {Country}";
@@ -35,6 +36,7 @@ public class Event
     private TimeSpan eventTime;
     private Address eventAddress;
 
+    // Constructor to initialize event details
     public Event(string title, string description, DateTime date, TimeSpan time, Address address)
     {
         eventTitle = title;
@@ -44,6 +46,7 @@ public class Event
         eventAddress = address;
     }
 
+    // Get the standard details of the event
     public string GetStandardDetails()
     {
         return $"Event Title: {eventTitle}\n" +
@@ -53,24 +56,18 @@ public class Event
                $"Address: {eventAddress}";
     }
 
+    // Get the full details of the event
     public virtual string GetFullDetails()
     {
         return GetStandardDetails();
     }
 
+    // Get a short description of the event
     public string GetShortDescription()
     {
-        string eventType = GetType().Name;
-        eventType = System.Text.RegularExpressions.Regex.Replace(eventType, "(\\B[A-Z])", " $1"); // Add spaces before capital letters
-        return $"Type: {eventType}\n" +
+        return $"Type: {GetType().Name}\n" +
                $"Event Title: {eventTitle}\n" +
                $"Date: {eventDate.ToShortDateString()}";
-    }
-
-
-    public string GetEventTitle()
-    {
-        return eventTitle;
     }
 }
 
@@ -80,6 +77,7 @@ public class LectureEvent : Event
     private string speaker;
     private int capacity;
 
+    // Constructor to initialize lecture event details
     public LectureEvent(string title, string description, DateTime date, TimeSpan time, Address address,
                         string speaker, int capacity)
         : base(title, description, date, time, address)
@@ -88,6 +86,7 @@ public class LectureEvent : Event
         this.capacity = capacity;
     }
 
+    // Override the GetFullDetails() method to include lecture event details
     public override string GetFullDetails()
     {
         return $"{base.GetFullDetails()}\n" +
@@ -102,6 +101,7 @@ public class ReceptionEvent : Event
 {
     private string rsvpEmail;
 
+    // Constructor to initialize reception event details
     public ReceptionEvent(string title, string description, DateTime date, TimeSpan time, Address address,
                           string rsvpEmail)
         : base(title, description, date, time, address)
@@ -109,6 +109,7 @@ public class ReceptionEvent : Event
         this.rsvpEmail = rsvpEmail;
     }
 
+    // Override the GetFullDetails() method to include reception event details
     public override string GetFullDetails()
     {
         return $"{base.GetFullDetails()}\n" +
@@ -122,6 +123,7 @@ public class OutdoorGatheringEvent : Event
 {
     private string weatherForecast;
 
+    // Constructor to initialize outdoor gathering event details
     public OutdoorGatheringEvent(string title, string description, DateTime date, TimeSpan time, Address address,
                                  string weatherForecast)
         : base(title, description, date, time, address)
@@ -129,6 +131,7 @@ public class OutdoorGatheringEvent : Event
         this.weatherForecast = weatherForecast;
     }
 
+    // Override the GetFullDetails() method to include outdoor gathering event details
     public override string GetFullDetails()
     {
         return $"{base.GetFullDetails()}\n" +
@@ -139,211 +142,46 @@ public class OutdoorGatheringEvent : Event
 
 class Program
 {
-    static void PrintAllEvents(List<Event> events)
-    {
-        // Print all events with their details
-        Console.WriteLine("All Events:");
-        Console.WriteLine("------------------------------------------------------------------------------");
-        foreach (Event ev in events)
-        {
-            Console.WriteLine("Event Details:");
-            Console.WriteLine("------------------------------------------------------------------------------");
-            Console.WriteLine("Standard Details:\n" + ev.GetStandardDetails());
-            Console.WriteLine("\nFull Details:\n" + ev.GetFullDetails());
-            Console.WriteLine("\nShort Description:\n" + ev.GetShortDescription());
-            Console.WriteLine("------------------------------------------------------------------------------");
-        }
-        Console.WriteLine("------------------------------------------------------------------------------");
-        Console.WriteLine();
-    }
-
     static void Main(string[] args)
     {
-        // Read event data from file
-        string[] eventData = File.ReadAllLines("events.txt");
+        // Create event instances
+        var lectureEvent = new LectureEvent("CSE 210 Deep Dive", "Exploring the latest advancements in Programming Classes",
+                                            new DateTime(2023, 5, 30), new TimeSpan(15, 0, 0),
+                                            new Address("123 Main Street", "New York", "NY", "USA"),
+                                            "John Doe", 100);
 
-        // Initialize event list and title list
-        List<Event> events = new List<Event>();
-        List<string> eventTitles = new List<string>();
+        var receptionEvent = new ReceptionEvent("Networking Mixer", "Join us for an evening of networking and fun!",
+                                                new DateTime(2023, 6, 15), new TimeSpan(18, 30, 0),
+                                                new Address("456 Elm Street", "Los Angeles", "CA", "USA"),
+                                                "rsvp@example.com");
 
-        // Initialize variables
-        Event currentEvent = null;
-        string eventType = null;
-        string eventTitle = null;
-        string eventDescription = null;
-        DateTime eventDate = DateTime.MinValue;
-        TimeSpan eventTime = TimeSpan.Zero;
-        Address eventAddress = null;
-        string speaker = null;
-        int capacity = 0;
-        string rsvpEmail = null;
-        string weatherForecast = null;
+        var outdoorEvent = new OutdoorGatheringEvent("Summer Picnic", "Enjoy a day of outdoor activities and delicious food!",
+                                                      new DateTime(2023, 7, 10), new TimeSpan(11, 0, 0),
+                                                      new Address("789 Oak Street", "San Francisco", "CA", "USA"),
+                                                      "Sunny skies");
 
-        // Process each line of event data
-        foreach (string line in eventData)
-        {
-            if (line.StartsWith("Type: "))
-            {
-                eventType = line.Substring(6);
-            }
-            else if (line.StartsWith("Event Title: "))
-            {
-                eventTitle = line.Substring(13);
-                eventTitles.Add(eventTitle);
-            }
-            else if (line.StartsWith("Description: "))
-            {
-                eventDescription = line.Substring(13);
-            }
-            else if (line.StartsWith("Date: "))
-            {
-                DateTime.TryParse(line.Substring(6), out eventDate);
-            }
-            else if (line.StartsWith("Time: "))
-            {
-                TimeSpan.TryParse(line.Substring(6), out eventTime);
-            }
-            else if (line.StartsWith("Address: "))
-            {
-                string[] addressData = line.Substring(9).Split(',');
-                eventAddress = new Address(addressData[0].Trim(), addressData[1].Trim(),
-                                           addressData[2].Trim(), addressData[3].Trim());
-            }
-            else if (line.StartsWith("Speaker: "))
-            {
-                speaker = line.Substring(9);
-            }
-            else if (line.StartsWith("Capacity: "))
-            {
-                int.TryParse(line.Substring(10), out capacity);
-            }
-            else if (line.StartsWith("RSVP Email: "))
-            {
-                rsvpEmail = line.Substring(12);
-            }
-            else if (line.StartsWith("Weather Forecast: "))
-            {
-                weatherForecast = line.Substring(19);
-            }
-            else if (line == "--- END ---")
-            {
-                // Create event instance based on the event type
-                switch (eventType)
-                {
-                    case "Lecture Event":
-                        currentEvent = new LectureEvent(eventTitle, eventDescription, eventDate, eventTime,
-                                                        eventAddress, speaker, capacity);
-                        break;
-                    case "Reception Event":
-                        currentEvent = new ReceptionEvent(eventTitle, eventDescription, eventDate, eventTime,
-                                                          eventAddress, rsvpEmail);
-                        break;
-                    case "Outdoor Gathering Event":
-                        currentEvent = new OutdoorGatheringEvent(eventTitle, eventDescription, eventDate, eventTime,
-                                                                 eventAddress, weatherForecast);
-                        break;
-                    default:
-                        Console.WriteLine($"Unknown event type: {eventType}");
-                        break;
-                }
+        // Generate marketing messages for each event
+        Console.WriteLine("-----------------------------------------");
+        Console.WriteLine("LECTURE EVENT");
+        Console.WriteLine("-----------------------------------------");
+        Console.WriteLine("Standard Details:\n" + lectureEvent.GetStandardDetails());
+        Console.WriteLine("\nFull Details:\n" + lectureEvent.GetFullDetails());
+        Console.WriteLine("\nShort Description:\n" + lectureEvent.GetShortDescription());
+        Console.WriteLine("");
+        Console.WriteLine("-----------------------------------------");
+        Console.WriteLine("RECEPTION EVENT");
+        Console.WriteLine("-----------------------------------------");
+        Console.WriteLine("Standard Details:\n" + receptionEvent.GetStandardDetails());
+        Console.WriteLine("\nFull Details:\n" + receptionEvent.GetFullDetails());
+        Console.WriteLine("\nShort Description:\n" + receptionEvent.GetShortDescription());
+        Console.WriteLine("");
+        Console.WriteLine("-----------------------------------------");
+        Console.WriteLine("OUTDOOR GATHERING EVENT");
+        Console.WriteLine("-----------------------------------------");
+        Console.WriteLine("Standard Details:\n" + outdoorEvent.GetStandardDetails());
+        Console.WriteLine("\nFull Details:\n" + outdoorEvent.GetFullDetails());
+        Console.WriteLine("\nShort Details:\n" + outdoorEvent.GetShortDescription());
 
-                // Add event to the list
-                if (currentEvent != null)
-                {
-                    events.Add(currentEvent);
-                }
-
-                // Reset variables for the next event
-                currentEvent = null;
-                eventType = null;
-                eventTitle = null;
-                eventDescription = null;
-                eventDate = DateTime.MinValue;
-                eventTime = TimeSpan.Zero;
-                eventAddress = null;
-                speaker = null;
-                capacity = 0;
-                rsvpEmail = null;
-                weatherForecast = null;
-            }
-        }
-
-        // Print the available event titles with numbers
-        Console.WriteLine("Available Event Titles:");
-        for (int i = 0; i < eventTitles.Count; i++)
-        {
-            Console.WriteLine($"{i + 1}. {eventTitles[i]}");
-        }
-
-        // Prompt the user to choose an event title by number
-        Console.WriteLine("\nPlease enter the number of the event title to print its details (or enter 'all' to print all events, or 'quit' to exit):");
-        string userInput = Console.ReadLine();
-        Console.Clear();
-
-        // Process user input
-        while (!userInput.Equals("quit", StringComparison.OrdinalIgnoreCase))
-        {
-            if (userInput.Equals("all", StringComparison.OrdinalIgnoreCase))
-            {
-                // Print details of all events
-                PrintAllEvents(events);
-            }
-            else
-            {
-                // Parse user input as a number
-                if (int.TryParse(userInput, out int eventNumber))
-                {
-                    // Check if the event number is within the valid range
-                    if (eventNumber > 0 && eventNumber <= eventTitles.Count)
-                    {
-                        // Get the corresponding event title
-                        string chosenEventTitle = eventTitles[eventNumber - 1];
-
-                        // Find the event with the chosen title
-                        Event chosenEvent = events.Find(eventObj => eventObj.GetEventTitle().Equals(chosenEventTitle, StringComparison.OrdinalIgnoreCase));
-
-                        // Print the event details if found, otherwise display an error message
-                        if (chosenEvent != null)
-                        {
-                            Console.WriteLine("------------------------------------------------------------------------------");
-                            Console.WriteLine("Event Details:");
-                            Console.WriteLine("------------------------------------------------------------------------------");
-                            Console.WriteLine("Standard Details:\n" + chosenEvent.GetStandardDetails());
-                            Console.WriteLine("\nFull Details:\n" + chosenEvent.GetFullDetails());
-                            Console.WriteLine("\nShort Description:\n" + chosenEvent.GetShortDescription());
-                            Console.WriteLine("------------------------------------------------------------------------------");
-                            Console.WriteLine("------------------------------------------------------------------------------");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Invalid event title. Please choose an event from the available list.");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid event number. Please choose a number from the available list.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. Please choose below");
-                }
-            }
-
-            Console.WriteLine();
-            // Print the available event titles with numbers
-            Console.WriteLine("Available Event Titles:");
-            for (int i = 0; i < eventTitles.Count; i++)
-            {
-                Console.WriteLine($"{i + 1}. {eventTitles[i]}");
-            }
-
-            // Prompt the user to choose another event title or quit
-            Console.WriteLine("\nPlease enter the number of the event title to print its details (or enter 'all' to print all events, or 'quit' to exit):");
-            userInput = Console.ReadLine();
-            Console.Clear();
-        }
-
-        Console.WriteLine("Program closed.");
+        Console.ReadLine();
     }
 }
