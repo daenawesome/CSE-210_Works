@@ -1,4 +1,4 @@
-This program represents a fitness activity tracker that allows users to log and view their exercise data. The program uses polymorphism to implement different types of activities such as running, cycling, and swimming, all derived from a common base class called `Activity`. Each activity has properties such as the date, length, and user ID, and provides methods to calculate and retrieve information about the activity, such as distance, speed, pace, and a summary.
+This modified program represents a fitness activity tracker that allows users to log and view their exercise data. The program uses polymorphism to implement different types of activities such as running, cycling, and swimming, all derived from a common base class called `Activity`. Each activity has properties such as the date, length, and user ID, and provides methods to calculate and retrieve information about the activity, such as distance, speed, pace, and a summary.
 
 Here's an overview of the key classes and their functionalities:
 

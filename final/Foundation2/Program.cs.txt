@@ -1,241 +1,100 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 
-// This modified program loads customer and order data from text files
+// The program creates customers, products, and orders, and then displays the packing labels, shipping labels, and total prices for each order.
 
 public class Program
 {
     public static void Main(string[] args)
     {
-        // File paths for customer and order data
-        string customerFilePath = "customer.txt";
-        string orderFilePath = "order.txt";
+        // Create customers
+        Address customerAddress1 = new Address("123 Main St", "New York", "NY", "USA");
+        Customer customer1 = new Customer("John Smith", customerAddress1);
 
-        // Check if both customer and order files exist
-        if (!File.Exists(customerFilePath) || !File.Exists(orderFilePath))
-        {
-            Console.WriteLine("One or both of the files customer.txt and order.txt are missing.");
-            return;
-        }
+        Address customerAddress2 = new Address("456 Elm St", "London", "", "UK");
+        Customer customer2 = new Customer("Jane Doe", customerAddress2);
 
-        // Load customers from the customer file
-        List<Customer> customers = LoadCustomersFromFile(customerFilePath);
+        // Create products
+        Product product1 = new Product("Product A", "A001", 10.99, 2);
+        Product product2 = new Product("Product B", "B002", 5.49, 3);
+        Product product3 = new Product("Product C", "C003", 8.99, 1);
 
-        // Check if there are any customers loaded
-        if (customers.Count == 0)
-        {
-            Console.WriteLine("customer.txt file is empty.");
-            return;
-        }
+        // Create orders
+        Order order1 = new Order(customer1);
+        order1.AddProduct(product1);
+        order1.AddProduct(product2);
 
-        // Load orders from the order file and associate them with customers
-        List<Order> orders = LoadOrdersFromFile(orderFilePath, customers);
+        Order order2 = new Order(customer2);
+        order2.AddProduct(product2);
+        order2.AddProduct(product3);
 
-        // Check if there are any orders loaded
-        if (orders.Count == 0)
-        {
-            Console.WriteLine("order.txt file is empty.");
-            return;
-        }
+        // Display packing labels, shipping labels, and total prices
+        Console.WriteLine("Order 1 Packing Label:\n" + order1.GetPackingLabel());
+        Console.WriteLine("Order 1 Shipping Label:\n" + order1.GetShippingLabel());
+        Console.WriteLine("Order 1 Total Price: $" + order1.GetTotalPrice());
 
-        // Process each order and display information
-        for (int i = 0; i < orders.Count; i++)
-        {
-            Order order = orders[i];
-            int orderNumber = i + 1;
+        Console.WriteLine();
 
-            Console.WriteLine("-------------------------------------------------------------------------");
-            Console.WriteLine($"Order {orderNumber} Packing Label:");
-            Console.WriteLine(order.GetPackingLabel());
-            Console.WriteLine();
-
-            Console.WriteLine($"Order {orderNumber} Shipping Label:");
-            Console.WriteLine(order.GetShippingLabel());
-            Console.WriteLine();
-
-            Console.WriteLine($"Order {orderNumber} Total Price: ${order.GetTotalPrice()}");
-            Console.WriteLine("-------------------------------------------------------------------------");
-        }
-    }
-
-    // Load customer data from a file and create a list of customers
-    public static List<Customer> LoadCustomersFromFile(string filePath)
-    {
-        List<Customer> customers = new List<Customer>();
-        string[] lines = File.ReadAllLines(filePath);
-
-        Customer customer = null;
-
-        foreach (string line in lines)
-        {
-            if (line.StartsWith("Customer_Id:"))
-            {
-                // Create a new customer and add it to the list
-                if (customer != null)
-                {
-                    customers.Add(customer);
-                }
-
-                // Parse the customer ID from the line
-                int customerId = int.Parse(line.Split(':')[1].Trim());
-                customer = new Customer(customerId);
-            }
-            else if (line.StartsWith("Customer_Name:"))
-            {
-                // Set the customer name
-                string customerName = line.Split(':')[1].Trim();
-                customer.Name = customerName;
-            }
-            else if (line.StartsWith("Customer_Address:"))
-            {
-                // Parse the customer address and set it
-                string customerAddress = line.Split(':')[1].Trim();
-                customer.Address = ParseAddress(customerAddress);
-            }
-        }
-
-        // Add the last customer to the list if it exists
-        if (customer != null)
-        {
-            customers.Add(customer);
-        }
-
-        return customers;
-    }
-
-    // Load order data from a file, associate orders with customers, and create a list of orders
-    public static List<Order> LoadOrdersFromFile(string filePath, List<Customer> customers)
-    {
-        List<Order> orders = new List<Order>();
-        string[] lines = File.ReadAllLines(filePath);
-
-        Order order = null;
-        int lineNumber = 0;
-
-        while (lineNumber < lines.Length)
-        {
-            string line = lines[lineNumber];
-            lineNumber++;
-
-            if (line.StartsWith("Customer_Id:"))
-            {
-                // Parse the customer ID from the line and find the associated customer
-                int customerId = int.Parse(line.Split(':')[1].Trim());
-                Customer customer = customers.Find(c => c.Id == customerId);
-
-                // Create a new order associated with the customer
-                order = new Order(customer);
-            }
-            else if (line.StartsWith("Product_Id:"))
-            {
-                // Parse product details from subsequent lines and create a product object
-                string productId = line.Split(':')[1].Trim();
-
-                string productName = GetValue(lines[lineNumber]);
-                lineNumber++;
-                string productPrice = GetValue(lines[lineNumber]);
-                lineNumber++;
-                string productQuantity = GetValue(lines[lineNumber]);
-                lineNumber++;
-
-                Product product = new Product(productName, productId, double.Parse(productPrice), int.Parse(productQuantity));
-
-                // Add the product to the current order
-                order.AddProduct(product);
-            }
-            else if (line.StartsWith("-- End of Order List for"))
-            {
-                // Add the completed order to the list
-                orders.Add(order);
-            }
-        }
-
-        return orders;
-    }
-
-    // Helper method to extract the value from a line of the format "Key: Value"
-    private static string GetValue(string line)
-    {
-        return line.Split(':')[1].Trim();
-    }
-
-    // Parse an address string into an Address object
-    public static Address ParseAddress(string addressString)
-    {
-        string[] addressParts = addressString.Split(',');
-        string streetAddress = addressParts[0].Trim();
-        string city = addressParts[1].Trim();
-        string stateProvince = addressParts[2].Trim();
-        string country = addressParts[3].Trim();
-
-        return new Address(streetAddress, city, stateProvince, country);
+        Console.WriteLine("Order 2 Packing Label:\n" + order2.GetPackingLabel());
+        Console.WriteLine("Order 2 Shipping Label:\n" + order2.GetShippingLabel());
+        Console.WriteLine("Order 2 Total Price: $" + order2.GetTotalPrice());
     }
 }
 
 public class Order
 {
-    private List<Product> products;
-    private Customer customer;
+    private List<Product> products; // List of products in the order
+    private Customer customer; // Customer who placed the order
 
     public Order(Customer customer)
     {
-        // Initialize the product list and associate the customer
         this.products = new List<Product>();
         this.customer = customer;
     }
 
-    // Add a product to the order
     public void AddProduct(Product product)
     {
-        products.Add(product);
+        products.Add(product); // Add a product to the order
     }
 
-    // Calculate the total price of the order, including product prices and shipping cost
     public double GetTotalPrice()
     {
         double totalPrice = 0;
 
         foreach (Product product in products)
         {
-            totalPrice += product.GetPrice();
+            totalPrice += product.GetPrice(); // Calculate the total price of all products in the order
         }
 
-        totalPrice += customer.GetShippingCost();
+        totalPrice += customer.GetShippingCost(); // Add shipping cost based on the customer's location
 
-        return totalPrice;
+        return totalPrice; // Return the total price including shipping cost
     }
 
-    // Generate a packing label for the order
     public string GetPackingLabel()
     {
         string packingLabel = "Packing Label:\n";
 
         foreach (Product product in products)
         {
-            packingLabel += $">> Name/Id/Quantity: {product.GetName()}, Product ID: {product.GetProductId()}, {product.GetQuantity()}\n";
+            packingLabel += $"Name: {product.GetName()}, Product ID: {product.GetProductId()}\n";
         }
 
-        return packingLabel;
+        return packingLabel; // Return the packing label for the order
     }
 
-    // Generate a shipping label for the order, including customer name and address
     public string GetShippingLabel()
     {
-        string shippingLabel = "Shipping Label:\n";
-        shippingLabel += $">> Customer Name: {customer.Name}\n";
-        shippingLabel += customer.Address.ToString();
-
-        return shippingLabel;
+        return "Shipping Label:\n" + customer.GetAddress().ToString(); // Return the shipping label with the customer's address
     }
 }
 
 public class Product
 {
-    private string name;
-    private string productId;
-    private double price;
-    private int quantity;
+    private string name; // Product name
+    private string productId; // Product ID
+    private double price; // Price per unit
+    private int quantity; // Quantity ordered
 
     public Product(string name, string productId, double price, int quantity)
     {
@@ -245,61 +104,55 @@ public class Product
         this.quantity = quantity;
     }
 
-    // Calculate the total price of the product(s) in the order
     public double GetPrice()
     {
-        return price * quantity;
+        return price * quantity; // Calculate the total price of the product based on the quantity
     }
 
-    // Get the product name
     public string GetName()
     {
-        return name;
+        return name; // Return the product name
     }
 
-    // Get the product ID
     public string GetProductId()
     {
-        return productId;
-    }
-
-    // Get the quantity of the product
-    public int GetQuantity()
-    {
-        return quantity;
+        return productId; // Return the product ID
     }
 }
 
 public class Customer
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public Address Address { get; set; }
+    private string name; // Customer name
+    private Address address; // Customer address
 
-    public Customer(int id)
+    public Customer(string name, Address address)
     {
-        Id = id;
+        this.name = name;
+        this.address = address;
     }
 
-    // Check if the customer's address is in the USA
     public bool IsInUSA()
     {
-        return Address.IsInUSA();
+        return address.IsInUSA(); // Check if the customer's address is in the USA
     }
 
-    // Get the shipping cost for the customer's address
     public double GetShippingCost()
     {
-        return IsInUSA() ? 5 : 35;
+        return IsInUSA() ? 5 : 35; // Return the shipping cost based on the customer's location
+    }
+
+    public Address GetAddress()
+    {
+        return address; // Return the customer's address
     }
 }
 
 public class Address
 {
-    private string streetAddress;
-    private string city;
-    private string stateProvince;
-    private string country;
+    private string streetAddress; // Street address
+    private string city; // City
+    private string stateProvince; // State or province
+    private string country; // Country
 
     public Address(string streetAddress, string city, string stateProvince, string country)
     {
@@ -309,15 +162,13 @@ public class Address
         this.country = country;
     }
 
-    // Check if the address is in the USA
     public bool IsInUSA()
     {
-        return string.Equals(country, "USA", StringComparison.OrdinalIgnoreCase);
+        return string.Equals(country, "USA", StringComparison.OrdinalIgnoreCase); // Check if the address is in the USA
     }
 
-    // Override the ToString method to display the address details
     public override string ToString()
     {
-        return $">> Street Address: {streetAddress}\n>> City: {city}\n>> State/Province: {stateProvince}\n>> Country: {country}";
+        return $"Street Address: {streetAddress}\nCity: {city}\nState/Province: {stateProvince}\nCountry: {country}"; // Return a formatted string representation of the address
     }
 }

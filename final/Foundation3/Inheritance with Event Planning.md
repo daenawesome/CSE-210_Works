@@ -1,6 +1,6 @@
 The provided program is an event management system that allows users to store and manage different types of events. It demonstrates the use of inheritance in object-oriented programming.
 
-Here's an explanation of the program's components and how inheritance is used:
+Here's an explanation of the modified program's components and how inheritance is used:
 
 1. Address Class:
    - This class represents the address details of an event. It has properties for street, city, state, and country.
